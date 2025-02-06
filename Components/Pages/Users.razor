@@ -1,0 +1,84 @@
+﻿@page "/users"
+@using ApprenticeEventManager.Models
+@using System.Diagnostics
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+
+<h2>New Users</h2>
+<EditForm EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2 p-1">
+                <label>First Name:</label>
+            </div>
+            <div class="col-md-4 p-1">
+                <InputText @bind-Value="formModel!.FirstName" />
+                <ValidationMessage For="@(() => formModel!.FirstName)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 p-1">
+                <label>Last Name:</label>
+            </div>
+            <div class="col-md-4 p-1">
+                <InputText @bind-Value="formModel!.LastName" />
+                <ValidationMessage For="@(() => formModel!.LastName)" />
+            </div>
+            <div class="row">
+                <div class="col-md-2 p-1">
+                    <label>Email:</label>
+                </div>
+                <div class="col-md-4 p-1">
+                    <InputText @bind-Value="formModel!.Email" />
+                    <ValidationMessage For="@(() => formModel!.Email)" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+      <button type="submit">Submit</button>
+    </div>
+</EditForm>
+
+@if (response != string.Empty)
+{
+    <p>@response</p>
+}
+
+<h4>Test info:</h4>
+<ul>
+    <li><p>@formModel!.FirstName</p></li>
+    <li><p>@formModel!.LastName</p></li>
+    <li><p>@formModel!.Email</p></li>
+</ul>
+
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private string response;
+
+    [SupplyParameterFromForm]
+    public User? formModel { get; set; }
+
+    protected override async Task OnInitializedAsync(){
+        formModel ??= new();
+        editContext = new(formModel);
+        messageStore = new(editContext);
+        response = string.Empty;
+    }
+
+    public void handleSubmit(){
+        Console.WriteLine("handleSubmit() has been triggered!");
+        Debugger.Break();
+        User newUser = new User();
+        newUser.FirstName = formModel!.FirstName;
+        newUser.LastName = formModel!.LastName;
+        newUser.Email = formModel!.Email;
+        Console.WriteLine($"Before DB function: {newUser.FirstName}, {newUser.LastName}, {newUser.Email}");
+        response = DatabaseServices.UserDb.AddUserDb(newUser);
+        StateHasChanged();
+    }
+}
