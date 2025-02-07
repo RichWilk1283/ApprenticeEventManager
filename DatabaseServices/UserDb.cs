@@ -8,11 +8,29 @@ namespace ApprenticeEventManager.DatabaseServices
 
     private static string connectionString = "Data Source=ApprenticeEventManager.db";
 
-    public static List<User> GetDbUsers()
+    public static List<User> GetAllDbUsers()
     {
+      List<User> users = new();
 
-      return new List<User>();
-
+      using (var connection = new SqliteConnection(connectionString))
+      {
+        connection.Open();
+        string query = "SELECT * FROM users";
+        using (var command = new SqliteCommand(query, connection))
+        using (var reader = command.ExecuteReader())
+        {
+          while (reader.Read())
+          {
+            User user = new();
+            user.Id = reader.GetInt32(0);
+            user.FirstName = reader.GetString(1);
+            user.LastName = reader.GetString(2);
+            user.Email = reader.GetString(3);
+            users.Add(user);
+          }
+        }
+      }
+      return users;
     }
 
     public static User GetById(int id)
@@ -34,21 +52,6 @@ namespace ApprenticeEventManager.DatabaseServices
         command.ExecuteNonQuery();
       }
       return $"Added User: {newUser.FirstName} {newUser.LastName}, {newUser.Email}";
-    }
-
-    public static string AddUserDbTEST()
-    {
-      using (var connection = new SqliteConnection(connectionString))
-      {
-        connection.Open();
-        string insertUserQuery = "INSERT INTO users (first_name, last_name, email) VALUES (@firstName, @lastName, @email)";
-        SqliteCommand command = new SqliteCommand(insertUserQuery, connection);
-        command.Parameters.AddWithValue("@firstName", "Steve");
-        command.Parameters.AddWithValue("@lastName", "Harrington");
-        command.Parameters.AddWithValue("@email", "steve@djo.co.uk");
-        command.ExecuteNonQuery();
-      }
-      return $"Added User";
     }
 
     public static string RemoveUserDb()

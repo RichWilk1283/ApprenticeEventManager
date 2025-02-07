@@ -38,7 +38,7 @@
         </div>
     </div>
     <div>
-      <button type="submit">Submit</button>
+        <button type="submit">Submit</button>
     </div>
 </EditForm>
 
@@ -59,6 +59,7 @@
     private EditContext? editContext;
     private ValidationMessageStore? messageStore;
     private string response;
+    private List<User> DbUsers;
 
     [SupplyParameterFromForm]
     public User? formModel { get; set; }
@@ -68,16 +69,14 @@
         editContext = new(formModel);
         messageStore = new(editContext);
         response = string.Empty;
+        DbUsers = DatabaseServices.UserDb.GetAllDbUsers();
     }
 
     public void handleSubmit(){
-        Console.WriteLine("handleSubmit() has been triggered!");
-        Debugger.Break();
         User newUser = new User();
         newUser.FirstName = formModel!.FirstName;
         newUser.LastName = formModel!.LastName;
         newUser.Email = formModel!.Email;
-        Console.WriteLine($"Before DB function: {newUser.FirstName}, {newUser.LastName}, {newUser.Email}");
         response = DatabaseServices.UserDb.AddUserDb(newUser);
         StateHasChanged();
     }

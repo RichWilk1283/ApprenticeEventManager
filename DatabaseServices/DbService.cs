@@ -4,7 +4,7 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class DbService
   {
-    private static string connectionString = "Data Source=ApprenticeEventManager.db";
+    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
 
     public static void InitialiseDb()
     {
@@ -61,7 +61,6 @@ namespace ApprenticeEventManager.DatabaseServices
           command.ExecuteNonQuery();
         }        
       }
-      Console.WriteLine("Hopefully db's created");
     }
   }
 }
