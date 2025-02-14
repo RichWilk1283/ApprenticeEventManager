@@ -1,0 +1,99 @@
+﻿@page "/users"
+@using ApprenticeEventManager.Models
+@using System.Diagnostics
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+
+
+<div class="container vw-100">
+  <div class="page-title-container">
+        <h2 class="page-title-heading">New Users</h2>
+  </div>
+  <div class="d-flex justify-content-center">
+    <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+        <div class="flex-column">
+          <div class="">
+              <div class="">
+                  <label>First Name:</label>
+              </div>
+              <div class="">
+                  <InputText @bind-Value="formModel!.FirstName" />
+                  <ValidationMessage For="@(() => formModel!.FirstName)" />
+              </div>
+          </div>
+          <div class="">
+              <div class="">
+                  <label>Last Name:</label>
+              </div>
+              <div class="">
+                  <InputText @bind-Value="formModel!.LastName" />
+                  <ValidationMessage For="@(() => formModel!.LastName)" />
+              </div>
+          </div>
+              <div class="">
+                  <div class="">
+                      <label>Email:</label>
+                  </div>
+                  <div class="">
+                      <InputText @bind-Value="formModel!.Email" />
+                      <ValidationMessage For="@(() => formModel!.Email)" />
+                  </div>
+              </div>
+      </div>
+      <div class="pt-3">
+          <button type="submit">Submit</button>
+      </div>
+  </EditForm>
+  </div>
+
+  @if (DbUsers == null)
+  {
+    <p>Loading...</p>
+  }
+  else
+  {
+    <div class="row">
+      @foreach (var user in DbUsers)
+      {
+            <div class="card p-3 m-1">
+                <div class="card-body">
+                    <h4 class="card-title">@user.LastName, @user.FirstName</h4>
+                    <p class="card-text">@user.Email</p>
+                    <a href="#" class="card-link">Update</a>
+                    <a href="#" class="card-link">Delete</a>
+                </div>
+            </div>
+      }
+    </div>
+  }
+</div>
+
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private string response;
+    private List<User> DbUsers;
+
+    [SupplyParameterFromForm]
+    public User? formModel { get; set; }
+
+    protected override async Task OnInitializedAsync(){
+        formModel ??= new();
+        editContext = new(formModel);
+        messageStore = new(editContext);
+        response = string.Empty;
+        DbUsers = DatabaseServices.UserDb.GetAllDbUsers();
+    }
+
+    public void handleSubmit(){
+        User newUser = new User();
+        newUser.FirstName = formModel!.FirstName;
+        newUser.LastName = formModel!.LastName;
+        newUser.Email = formModel!.Email;
+        response = DatabaseServices.UserDb.AddUserDb(newUser);
+        StateHasChanged();
+    }
+}

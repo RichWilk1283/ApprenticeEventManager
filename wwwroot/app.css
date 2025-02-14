@@ -49,3 +49,28 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.page-title-container {
+  display: flex;
+  justify-content:center;
+  margin: 4px;
+}
+
+.page-title-heading {
+  background-color: aquamarine;
+  border-radius: 40px;
+  padding: 8px 20px 8px 20px;
+}
+
+.form-container {
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  background-color: aquamarine;
+  border-radius: 40px;
+  padding: 25px;
+}
+
+.colour-yellow {
+  color: yellow;
+}
