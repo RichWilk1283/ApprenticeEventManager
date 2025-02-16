@@ -11,6 +11,8 @@ builder.Services.AddSingleton<DbService>();
 
 var app = builder.Build();
 
+DbService.InitialiseDb();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
