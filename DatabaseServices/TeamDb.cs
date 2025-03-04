@@ -1,3 +1,4 @@
+using ApprenticeEventManager.Components.Teams.Pages;
 using ApprenticeEventManager.Models;
 using Microsoft.Data.Sqlite;
 
@@ -5,7 +6,7 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class TeamDb
   {
-    private static string connectionString = "Data Source=ApprenticeEventManager.db";
+    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
 
     public static List<Team> GetAllDbTeams()
     {
@@ -14,8 +15,8 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string query = "SELECT * FROM team";
-        using (var command = new SqliteCommand(query, connection))
+        string getAllQuery = "SELECT * FROM teams";
+        using (var command = new SqliteCommand(getAllQuery, connection))
         using (var reader = command.ExecuteReader())
         {
           while (reader.Read())
@@ -31,12 +32,39 @@ namespace ApprenticeEventManager.DatabaseServices
       return teams;
     }
 
+    public static Team GetTeamById(int id)
+    {
+      using (var connection = new SqliteConnection(connectionString))
+      {
+        connection.Open();
+        string getByIdQuery = "SELECT * FROM teams WHERE team_id = @teamId";
+        using (var command = new SqliteCommand(getByIdQuery, connection))
+        {
+          command.Parameters.AddWithValue("@teamId", id);
+
+          using (var reader = command.ExecuteReader())
+          {
+            if (reader.Read())
+            {
+              return new Team 
+              {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1),
+                HomeOffice = reader.GetString(2)
+              };
+            }
+          }
+        }
+      }
+      return null;
+    }
+
     public static string AddTeamDb(Team newTeam)
     {
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string insertQuery = "INSERT INTO team (name, home_office) VALUES (@name, @homeOffice)";
+        string insertQuery = "INSERT INTO teams (name, home_office) VALUES (@name, @homeOffice)";
         SqliteCommand command = new SqliteCommand(insertQuery, connection);
         command.Parameters.AddWithValue("@name", newTeam.Name);
         command.Parameters.AddWithValue("@homeOffice", newTeam.HomeOffice);
@@ -44,6 +72,48 @@ namespace ApprenticeEventManager.DatabaseServices
       }
       return $"Added Team: {newTeam.Name}, with a home office of: {newTeam.HomeOffice}.";
 
+    }
+
+    public static bool RemoveTeamDb(Team team)
+    {
+      Team teamCheck = GetTeamById(team.Id);
+
+      if (teamCheck == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(connectionString))
+      {
+        connection.Open();
+        string deleteQuery = "DELETE FROM teams WHERE team_id = @teamId";
+        SqliteCommand command = new SqliteCommand(deleteQuery, connection);
+        command.Parameters.AddWithValue("@teamId", team.Id);
+        command.ExecuteNonQuery();
+      }
+      return true;
+    }
+
+    public static bool UpdateTeamDb(Team updatedTeam)
+    {
+      Team teamCheck = GetTeamById(updatedTeam.Id);
+
+      if (teamCheck == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(connectionString))
+      {
+        connection.Open();
+        string updateQuery = "UPDATE teams SET name = @teamName, home_office = @homeOffice WHERE team_id = @teamId";
+        SqliteCommand command = new SqliteCommand(updateQuery, connection);
+        command.Parameters.AddWithValue("@teamName", updatedTeam.Name);
+        command.Parameters.AddWithValue("@homeOffice", updatedTeam.HomeOffice);
+        command.Parameters.AddWithValue("@teamId", updatedTeam.Id);
+        command.ExecuteNonQuery();
+      }
+      return true;
     }
   }
 }

@@ -4,9 +4,15 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class DbService
   {
-    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
+    //private readonly string connectionString = "Data Source=ApprenticeEventManager.db";
+    private readonly string _connectionString;
 
-    public static void InitialiseDb()
+    public DbService(IConfiguration config)
+    {
+      _connectionString = config.GetConnectionString("DefaultConnection");
+    }
+
+    public void InitialiseDb()
     {
 
       string[] tableQuery = [
@@ -39,7 +45,7 @@ namespace ApprenticeEventManager.DatabaseServices
         "end TEXT NOT NULL," +
         "required_apprentices INTEGER)",
 
-        "CREATE TABLE IF NOT EXISTS team (" +
+        "CREATE TABLE IF NOT EXISTS teams (" +
         "team_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "name TEXT NOT NULL," +
         "home_office TEXT)",
@@ -51,7 +57,7 @@ namespace ApprenticeEventManager.DatabaseServices
         "email TEXT)"
       ];
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
 
@@ -61,6 +67,10 @@ namespace ApprenticeEventManager.DatabaseServices
           command.ExecuteNonQuery();
         }        
       }
+
     }
+
+
+
   }
 }

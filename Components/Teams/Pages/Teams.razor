@@ -1,63 +1,66 @@
 ﻿@page "/teams"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
 @using ApprenticeEventManager.Models
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 
 <div class="container vw-100">
-  <div class="page-title-container">
+    <div class="page-title-container">
         <h2 class="page-title-heading">New Teams</h2>
-  </div>
-  <div class="d-flex justify-content-center">
-    <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewTeam">
-      <DataAnnotationsValidator />
-      <ValidationSummary />
-        <div class="flex-column">
-          <div class="">
-              <div class="">
-                  <label>Name:</label>
-              </div>
-              <div class="">
-                  <InputText @bind-Value="formModel!.Name" />
-                  <ValidationMessage For="@(() => formModel!.Name)" />
-              </div>
-          </div>
-          <div class="">
-              <div class="">
-                  <label>Home Office:</label>
-              </div>
-              <div class="">
-                  <InputText @bind-Value="formModel!.HomeOffice" />
-                  <ValidationMessage For="@(() => formModel!.HomeOffice)" />
-              </div>
-          </div>
-      </div>
-      <div class="pt-3">
-          <button type="submit">Submit</button>
-      </div>
-  </EditForm>
-  </div>
-
-  @if (DbTeams == null)
-  {
-    <p>Loading...</p>
-  }
-  else
-  {
-    <div class="row">
-      @foreach (var team in DbTeams)
-      {
-            <div class="card p-3 m-1">
-                <div class="card-body">
-                    <h4 class="card-title">@team.Name</h4>
-                    <p class="card-text">@team.HomeOffice</p>
-                    <a href="#" class="card-link">Update</a>
-                    <a href="#" class="card-link">Delete</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="NewTeam">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="flex-column">
+                <div class="">
+                    <div class="">
+                        <label>Name:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.Name" />
+                        <ValidationMessage For="@(() => formModel!.Name)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Home Office:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.HomeOffice" />
+                        <ValidationMessage For="@(() => formModel!.HomeOffice)" />
+                    </div>
                 </div>
             </div>
-      }
+            <div class="pt-3">
+                <button type="submit">Submit</button>
+            </div>
+        </EditForm>
     </div>
-  }
+
+    @if (DbTeams == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var team in DbTeams)
+            {
+                <div class="card p-3 m-1">
+                    <div class="card-body">
+                        <h4 class="card-title">@team.Name</h4>
+                        <p class="card-text">@team.HomeOffice</p>
+                        <button href="#" class="card-link">Update</button>
+                        <button href="#" class="card-link" @onclick="@( async () => await HandleDelete(team))">Delete</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 
@@ -79,12 +82,31 @@
         DbTeams = DatabaseServices.TeamDb.GetAllDbTeams();
     }
 
-    public void handleSubmit()
+    public void HandleSubmit()
     {
         Team newTeam = new Team();
         newTeam.Name = formModel!.Name;
         newTeam.HomeOffice = formModel!.HomeOffice;
         response = DatabaseServices.TeamDb.AddTeamDb(newTeam);
-        StateHasChanged();
+        //StateHasChanged();
+        _navigationManager.NavigateTo("/teams", true);
+    }
+
+    public void HandleUpdate(Team team)
+    {
+
+    }
+
+    public async Task HandleDelete(Team team)
+    {
+        var success = DatabaseServices.TeamDb.RemoveTeamDb(team);
+        if (success)
+        {
+            response = "Team Deleted.";
+        }
+        else response = "Team not found";
+
+        //StateHasChanged();
+        _navigationManager.NavigateTo("/teams", true);
     }
 }

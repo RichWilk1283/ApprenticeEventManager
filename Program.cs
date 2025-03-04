@@ -3,6 +3,13 @@ using ApprenticeEventManager.DatabaseServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Added for using in a docker container.
+// Configure Kestrel to listen on all network interfaces
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+  serverOptions.ListenAnyIP(8080); // Match the Docker port
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -11,7 +18,8 @@ builder.Services.AddSingleton<DbService>();
 
 var app = builder.Build();
 
-DbService.InitialiseDb();
+var dataBase = app.Services.GetRequiredService<DbService>();
+dataBase.InitialiseDb();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

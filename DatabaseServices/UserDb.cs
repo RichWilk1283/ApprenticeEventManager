@@ -6,7 +6,7 @@ namespace ApprenticeEventManager.DatabaseServices
   public class UserDb
   {
 
-    private static string connectionString = "Data Source=ApprenticeEventManager.db";
+    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
 
     public static List<User> GetAllDbUsers()
     {
