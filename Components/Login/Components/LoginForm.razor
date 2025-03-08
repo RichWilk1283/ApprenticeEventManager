@@ -1,0 +1,80 @@
+﻿@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+@inject LoginService _LoginService
+
+@using ApprenticeEventManager.Components.Login.Models
+@using ApprenticeEventManager.Models
+@using System.Diagnostics
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+
+<h3>LoginForm</h3>
+
+<EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="Login">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="flex-column">
+        <div class="">
+            <div class="">
+                <label>Email:</label>
+            </div>
+            <div class="">
+                <InputText @bind-Value="formModel!.Email" />
+                <ValidationMessage For="@(() => formModel!.Email)" />
+            </div>
+        </div>
+        <div class="">
+            <div class="">
+                <label>Password:</label>
+            </div>
+            <div class="">
+                <InputText @bind-Value="formModel!.HashedPassword" />
+                <ValidationMessage For="@(() => formModel!.HashedPassword)" />
+            </div>
+        </div>
+    </div>
+    <div class="pt-3">
+        <button type="submit">Submit</button>
+    </div>
+</EditForm>
+
+@if (response == string.Empty)
+{
+    <p>NOTHING</p>
+}
+else
+{
+  <p>@response</p>
+}
+
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private string response;
+
+    [SupplyParameterFromForm]
+    public LoginFormModel? formModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        formModel ??= new();
+        editContext = new(formModel);
+        messageStore = new(editContext);
+        response = string.Empty;
+    }
+
+    public void HandleSubmit()
+    {
+        //handle login
+        bool found = _LoginService.AuthenticateUser(formModel!);
+        if (found)
+        {
+            response = "FOUND";
+        }
+        StateHasChanged();
+        //_navigationManager.NavigateTo("/", true);
+    }
+
+
+}

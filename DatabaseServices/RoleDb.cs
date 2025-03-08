@@ -14,7 +14,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string query = "SELECT * FROM roles";
+        string query = "SELECT * FROM aemapp_roles";
         using (var command = new SqliteCommand(query, connection))
         using (var reader = command.ExecuteReader())
         {
@@ -40,7 +40,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string insertQuery = "INSERT INTO roles (name) VALUES (@name)";
+        string insertQuery = "INSERT INTO aemapp_roles (name) VALUES (@name)";
         SqliteCommand command = new SqliteCommand(insertQuery, connection);
         command.Parameters.AddWithValue("@name", newRole.Name);
         command.ExecuteNonQuery();

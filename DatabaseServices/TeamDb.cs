@@ -15,7 +15,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string getAllQuery = "SELECT * FROM teams";
+        string getAllQuery = "SELECT * FROM aemapp_teams";
         using (var command = new SqliteCommand(getAllQuery, connection))
         using (var reader = command.ExecuteReader())
         {
@@ -37,7 +37,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string getByIdQuery = "SELECT * FROM teams WHERE team_id = @teamId";
+        string getByIdQuery = "SELECT * FROM aemapp_teams WHERE team_id = @teamId";
         using (var command = new SqliteCommand(getByIdQuery, connection))
         {
           command.Parameters.AddWithValue("@teamId", id);
@@ -64,7 +64,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string insertQuery = "INSERT INTO teams (name, home_office) VALUES (@name, @homeOffice)";
+        string insertQuery = "INSERT INTO aemapp_teams (name, home_office) VALUES (@name, @homeOffice)";
         SqliteCommand command = new SqliteCommand(insertQuery, connection);
         command.Parameters.AddWithValue("@name", newTeam.Name);
         command.Parameters.AddWithValue("@homeOffice", newTeam.HomeOffice);
@@ -86,7 +86,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string deleteQuery = "DELETE FROM teams WHERE team_id = @teamId";
+        string deleteQuery = "DELETE FROM aemapp_teams WHERE team_id = @teamId";
         SqliteCommand command = new SqliteCommand(deleteQuery, connection);
         command.Parameters.AddWithValue("@teamId", team.Id);
         command.ExecuteNonQuery();
@@ -106,7 +106,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(connectionString))
       {
         connection.Open();
-        string updateQuery = "UPDATE teams SET name = @teamName, home_office = @homeOffice WHERE team_id = @teamId";
+        string updateQuery = "UPDATE aemapp_teams SET name = @teamName, home_office = @homeOffice WHERE team_id = @teamId";
         SqliteCommand command = new SqliteCommand(updateQuery, connection);
         command.Parameters.AddWithValue("@teamName", updatedTeam.Name);
         command.Parameters.AddWithValue("@homeOffice", updatedTeam.HomeOffice);

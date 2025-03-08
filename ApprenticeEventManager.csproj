@@ -12,8 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Components\Login\Services\" />
-    <Folder Include="Components\Login\Components\" />
-    <Folder Include="LoginServices\" />
   </ItemGroup>
 
 </Project>

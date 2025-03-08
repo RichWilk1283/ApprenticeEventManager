@@ -1,5 +1,6 @@
 using ApprenticeEventManager.Components;
 using ApprenticeEventManager.DatabaseServices;
+using ApprenticeEventManager.LoginServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddSingleton<DbService>();
+builder.Services.AddSingleton<LoginService>();
 
 var app = builder.Build();
 

@@ -3,71 +3,82 @@
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Identity
 
 
 <div class="container vw-100">
-  <div class="page-title-container">
+    <div class="page-title-container">
         <h2 class="page-title-heading">New Users</h2>
-  </div>
-  <div class="d-flex justify-content-center">
-    <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
-      <DataAnnotationsValidator />
-      <ValidationSummary />
-        <div class="flex-column">
-          <div class="">
-              <div class="">
-                  <label>First Name:</label>
-              </div>
-              <div class="">
-                  <InputText @bind-Value="formModel!.FirstName" />
-                  <ValidationMessage For="@(() => formModel!.FirstName)" />
-              </div>
-          </div>
-          <div class="">
-              <div class="">
-                  <label>Last Name:</label>
-              </div>
-              <div class="">
-                  <InputText @bind-Value="formModel!.LastName" />
-                  <ValidationMessage For="@(() => formModel!.LastName)" />
-              </div>
-          </div>
-              <div class="">
-                  <div class="">
-                      <label>Email:</label>
-                  </div>
-                  <div class="">
-                      <InputText @bind-Value="formModel!.Email" />
-                      <ValidationMessage For="@(() => formModel!.Email)" />
-                  </div>
-              </div>
-      </div>
-      <div class="pt-3">
-          <button type="submit">Submit</button>
-      </div>
-  </EditForm>
-  </div>
-
-  @if (DbUsers == null)
-  {
-    <p>Loading...</p>
-  }
-  else
-  {
-    <div class="row">
-      @foreach (var user in DbUsers)
-      {
-            <div class="card p-3 m-1">
-                <div class="card-body">
-                    <h4 class="card-title">@user.LastName, @user.FirstName</h4>
-                    <p class="card-text">@user.Email</p>
-                    <a href="#" class="card-link">Update</a>
-                    <a href="#" class="card-link">Delete</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="flex-column">
+                <div class="">
+                    <div class="">
+                        <label>First Name:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.FirstName" />
+                        <ValidationMessage For="@(() => formModel!.FirstName)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Last Name:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.LastName" />
+                        <ValidationMessage For="@(() => formModel!.LastName)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Email:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.Email" />
+                        <ValidationMessage For="@(() => formModel!.Email)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Password:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.HashedPassword" />
+                        <ValidationMessage For="@(() => formModel!.HashedPassword)" />
+                    </div>
                 </div>
             </div>
-      }
+            <div class="pt-3">
+                <button type="submit">Submit</button>
+            </div>
+        </EditForm>
     </div>
-  }
+
+    @if (DbUsers == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var user in DbUsers)
+            {
+                <div class="card p-3 m-1">
+                    <div class="card-body">
+                        <h4 class="card-title">@user.LastName, @user.FirstName</h4>
+                        <p class="card-text">@user.Email</p>
+                        <p class="card-text">@user.HashedPassword</p>
+                        <a href="#" class="card-link">Update</a>
+                        <a href="#" class="card-link">Delete</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 
@@ -93,7 +104,20 @@
         newUser.FirstName = formModel!.FirstName;
         newUser.LastName = formModel!.LastName;
         newUser.Email = formModel!.Email;
+
+        var passwordHasher = new PasswordHasher<User>();
+        newUser.HashedPassword = passwordHasher.HashPassword(null, formModel!.HashedPassword);
         response = DatabaseServices.UserDb.AddUserDb(newUser);
         StateHasChanged();
     }
+
+    // private void ComputeHash()
+    // {
+    //     using (var sha256 = System.Security.Cryptography.SHA256.Create())
+    //     {
+    //         byte[] hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(InputText));
+    //         HashedOutput = hashBytes.ToString();
+    //     }
+    //     StateHasChanged();
+    // }
 }

@@ -1,8 +1,7 @@
 ﻿namespace ApprenticeEventManager.Models
 {
-  public class BusinessFunction
+  public class BusinessFunction : DbModel
   {
-    public int Id { get; set; }
     public string Name { get; set; }
   }
 }

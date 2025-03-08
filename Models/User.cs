@@ -2,9 +2,8 @@
 
 namespace ApprenticeEventManager.Models
 {
-  public class User
+  public class User : DbModel
   {
-    public int Id { get; set; }
     [Required]
     [StringLength(50, ErrorMessage = "Too Long.")]
     public string FirstName { get; set; }
@@ -14,5 +13,7 @@ namespace ApprenticeEventManager.Models
     [Required]
     [StringLength(50, ErrorMessage = "Too Long.")]
     public string Email { get; set; }
+    [StringLength(20, ErrorMessage = "Too Long.")]
+    public string HashedPassword { get; set; }
   }
 }

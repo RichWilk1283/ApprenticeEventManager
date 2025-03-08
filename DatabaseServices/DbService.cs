@@ -16,14 +16,14 @@ namespace ApprenticeEventManager.DatabaseServices
     {
 
       string[] tableQuery = [
-        "CREATE TABLE IF NOT EXISTS events (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_events (" +
         "event_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "name TEXT NOT NULL," +
         "description TEXT," +
         "date TEXT NOT NULL," +
         "apprentices_required INTEGER)",
 
-        "CREATE TABLE IF NOT EXISTS addresses (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_addresses (" +
         "address_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "number_name TEXT NOT NULL," +
         "street_name TEXT," +
@@ -31,30 +31,38 @@ namespace ApprenticeEventManager.DatabaseServices
         "county TEXT," +
         "postcode TEXT)",
 
-        "CREATE TABLE IF NOT EXISTS business_function (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_business_function (" +
         "function_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "name TEXT NOT NULL)",
 
-        "CREATE TABLE IF NOT EXISTS roles (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_roles (" +
         "role_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "name TEXT NOT NULL)",
 
-        "CREATE TABLE IF NOT EXISTS slots (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_slots (" +
         "slot_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "start TEXT NOT NULL," +
         "end TEXT NOT NULL," +
         "required_apprentices INTEGER)",
 
-        "CREATE TABLE IF NOT EXISTS teams (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_teams (" +
         "team_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "name TEXT NOT NULL," +
         "home_office TEXT)",
 
-        "CREATE TABLE IF NOT EXISTS users (" +
+        "CREATE TABLE IF NOT EXISTS aemapp_users (" +
         "user_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "first_name TEXT NOT NULL," +
         "last_name TEXT," +
-        "email TEXT)"
+        "email TEXT," +
+        "password TEXT)",
+
+        "CREATE TABLE IF NOT EXISTS aemapp_login_log (" +
+        "log_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "login_date TEXT NOT NULL," +
+        "successful INTEGER NOT NULL CHECK (successful IN (0, 1))," +
+        "login_email TEXT," +
+        "login_password TEXT)"
       ];
 
       using (var connection = new SqliteConnection(_connectionString))
