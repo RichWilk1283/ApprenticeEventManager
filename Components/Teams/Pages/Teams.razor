@@ -88,13 +88,14 @@
         newTeam.Name = formModel!.Name;
         newTeam.HomeOffice = formModel!.HomeOffice;
         response = DatabaseServices.TeamDb.AddTeamDb(newTeam);
-        //StateHasChanged();
+        
         _navigationManager.NavigateTo("/teams", true);
     }
 
     public void HandleUpdate(Team team)
     {
-
+      //show update form?
+      //call update DB function on new data
     }
 
     public async Task HandleDelete(Team team)
@@ -106,7 +107,6 @@
         }
         else response = "Team not found";
 
-        //StateHasChanged();
         _navigationManager.NavigateTo("/teams", true);
     }
 }

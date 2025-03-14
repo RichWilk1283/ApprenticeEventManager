@@ -8,6 +8,6 @@ namespace ApprenticeEventManager.Components.Login.Models
     [StringLength(50, ErrorMessage = "Too Long.")]
     public string Email { get; set; }
     [StringLength(20, ErrorMessage = "Too Long.")]
-    public string HashedPassword { get; set; }
+    public string Password { get; set; }
   }
 }

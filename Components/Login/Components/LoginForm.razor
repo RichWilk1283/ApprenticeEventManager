@@ -28,8 +28,8 @@
                 <label>Password:</label>
             </div>
             <div class="">
-                <InputText @bind-Value="formModel!.HashedPassword" />
-                <ValidationMessage For="@(() => formModel!.HashedPassword)" />
+                <InputText type="password" @bind-Value="formModel!.Password" />
+                <ValidationMessage For="@(() => formModel!.Password)" />
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
 }
 else
 {
-  <p>@response</p>
+    <p>@response</p>
 }
 
 
@@ -70,7 +70,12 @@ else
         bool found = _LoginService.AuthenticateUser(formModel!);
         if (found)
         {
+            _LoginService.LogLoginAttempt(formModel!, 1);
             response = "FOUND";
+        }
+        else
+        {
+            _LoginService.LogLoginAttempt(formModel!, 0);
         }
         StateHasChanged();
         //_navigationManager.NavigateTo("/", true);

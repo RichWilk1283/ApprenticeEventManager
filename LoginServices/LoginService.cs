@@ -20,7 +20,7 @@ namespace ApprenticeEventManager.LoginServices
       User dbUser = UserDb.GetUserByEmail(authUser.Email);
 
       var passwordHasher = new PasswordHasher<User>();
-      var result = passwordHasher.VerifyHashedPassword(dbUser, dbUser.HashedPassword, authUser.HashedPassword);
+      var result = passwordHasher.VerifyHashedPassword(dbUser, dbUser.HashedPassword, authUser.Password);
 
       return result == PasswordVerificationResult.Success;
     }
@@ -35,7 +35,7 @@ namespace ApprenticeEventManager.LoginServices
         command.Parameters.AddWithValue("@logindate", new DateTime());
         command.Parameters.AddWithValue("@successful", successful);
         command.Parameters.AddWithValue("@loginemail", loginUser.Email);
-        command.Parameters.AddWithValue("@loginpassword", loginUser.HashedPassword);
+        command.Parameters.AddWithValue("@loginpassword", loginUser.Password);
         command.ExecuteNonQuery();
       }
 
