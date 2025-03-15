@@ -1,4 +1,10 @@
 ﻿@page "/users"
+
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+@inject UserDb _userDb
+
+@using ApprenticeEventManager.DatabaseServices
 @using ApprenticeEventManager.Models
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
@@ -73,7 +79,7 @@
                         <p class="card-text">@user.Email</p>
                         <p class="card-text">@user.HashedPassword</p>
                         <a href="#" class="card-link">Update</a>
-                        <a href="#" class="card-link">Delete</a>
+                        <a href="#" class="card-link" @onclick="@(async ()=> await HandleDelete(user))">Delete</a>
                     </div>
                 </div>
             }
@@ -96,7 +102,7 @@
         editContext = new(formModel);
         messageStore = new(editContext);
         response = string.Empty;
-        DbUsers = DatabaseServices.UserDb.GetAllDbUsers();
+        DbUsers = _userDb.GetAllDbUsers();
     }
 
     public void handleSubmit(){
@@ -107,7 +113,27 @@
 
         var passwordHasher = new PasswordHasher<User>();
         newUser.HashedPassword = passwordHasher.HashPassword(null, formModel!.HashedPassword);
-        response = DatabaseServices.UserDb.AddUserDb(newUser);
+        response = _userDb.AddUserDb(newUser);
         StateHasChanged();
+        _navigationManager.NavigateTo("/users", true);
     }
+
+    public void HandleUpdate(User user)
+    {
+        //show update form?
+        //call update DB function on new data
+    }
+
+    public async Task HandleDelete(User user)
+    {
+        var success = _userDb.RemoveUserDb(user);
+        if (success)
+        {
+            response = "User Deleted.";
+        }
+        else response = "User not found";
+
+        _navigationManager.NavigateTo("/users", true);
+    }
+
 }

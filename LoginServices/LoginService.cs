@@ -9,15 +9,17 @@ namespace ApprenticeEventManager.LoginServices
   public class LoginService
   {
     private readonly string _connectionString;
+    private UserDb _userDb;
 
-    public LoginService(IConfiguration config)
+    public LoginService(IConfiguration config, UserDb userDb)
     {
       _connectionString = config.GetConnectionString("DefaultConnection");
+      _userDb = userDb;
     }
 
     public bool AuthenticateUser(LoginFormModel authUser)
     {
-      User dbUser = UserDb.GetUserByEmail(authUser.Email);
+      User dbUser = _userDb.GetUserByEmail(authUser.Email);
 
       var passwordHasher = new PasswordHasher<User>();
       var result = passwordHasher.VerifyHashedPassword(dbUser, dbUser.HashedPassword, authUser.Password);
@@ -38,8 +40,6 @@ namespace ApprenticeEventManager.LoginServices
         command.Parameters.AddWithValue("@loginpassword", loginUser.Password);
         command.ExecuteNonQuery();
       }
-
-
     }
   }
 }

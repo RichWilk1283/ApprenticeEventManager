@@ -4,7 +4,6 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class DbService
   {
-    //private readonly string connectionString = "Data Source=ApprenticeEventManager.db";
     private readonly string _connectionString;
 
     public DbService(IConfiguration config)
@@ -75,10 +74,6 @@ namespace ApprenticeEventManager.DatabaseServices
           command.ExecuteNonQuery();
         }        
       }
-
     }
-
-
-
   }
 }

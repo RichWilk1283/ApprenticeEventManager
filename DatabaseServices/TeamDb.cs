@@ -6,13 +6,18 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class TeamDb
   {
-    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
+    private readonly string _connectionString;
 
-    public static List<Team> GetAllDbTeams()
+    public TeamDb(IConfiguration config)
+    {
+      _connectionString = config.GetConnectionString("DefaultConnection");
+    }
+
+    public List<Team> GetAllDbTeams()
     {
       List<Team> teams = new();
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string getAllQuery = "SELECT * FROM aemapp_teams";
@@ -32,9 +37,9 @@ namespace ApprenticeEventManager.DatabaseServices
       return teams;
     }
 
-    public static Team GetTeamById(int id)
+    public Team GetTeamById(int id)
     {
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string getByIdQuery = "SELECT * FROM aemapp_teams WHERE team_id = @teamId";
@@ -59,9 +64,9 @@ namespace ApprenticeEventManager.DatabaseServices
       return null;
     }
 
-    public static string AddTeamDb(Team newTeam)
+    public string AddTeamDb(Team newTeam)
     {
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string insertQuery = "INSERT INTO aemapp_teams (name, home_office) VALUES (@name, @homeOffice)";
@@ -74,7 +79,7 @@ namespace ApprenticeEventManager.DatabaseServices
 
     }
 
-    public static bool RemoveTeamDb(Team team)
+    public bool RemoveTeamDb(Team team)
     {
       Team teamCheck = GetTeamById(team.Id);
 
@@ -83,7 +88,7 @@ namespace ApprenticeEventManager.DatabaseServices
         return false;
       }
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string deleteQuery = "DELETE FROM aemapp_teams WHERE team_id = @teamId";
@@ -94,7 +99,7 @@ namespace ApprenticeEventManager.DatabaseServices
       return true;
     }
 
-    public static bool UpdateTeamDb(Team updatedTeam)
+    public bool UpdateTeamDb(Team updatedTeam)
     {
       Team teamCheck = GetTeamById(updatedTeam.Id);
 
@@ -103,7 +108,7 @@ namespace ApprenticeEventManager.DatabaseServices
         return false;
       }
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string updateQuery = "UPDATE aemapp_teams SET name = @teamName, home_office = @homeOffice WHERE team_id = @teamId";

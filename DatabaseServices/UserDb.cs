@@ -1,4 +1,5 @@
-﻿using ApprenticeEventManager.Components.Users.Pages;
+﻿using ApprenticeEventManager.Components.Teams.Pages;
+using ApprenticeEventManager.Components.Users.Pages;
 using ApprenticeEventManager.Models;
 using Microsoft.Data.Sqlite;
 
@@ -6,14 +7,18 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class UserDb
   {
+    private readonly string _connectionString;
 
-    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
+    public UserDb(IConfiguration config)
+    {
+      _connectionString = config.GetConnectionString("DefaultConnection");
+    }
 
-    public static List<User> GetAllDbUsers()
+    public List<User> GetAllDbUsers()
     {
       List<User> users = new();
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string query = "SELECT * FROM aemapp_users";
@@ -35,16 +40,40 @@ namespace ApprenticeEventManager.DatabaseServices
       return users;
     }
 
-    public static User GetUserById(int id)
+    public User GetUserById(int id)
     {
-      return new User();
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string getByIdQuery = "SELECT * FROM aemapp_users WHERE user_id = @userId";
+        using (var command = new SqliteCommand(getByIdQuery, connection))
+        {
+          command.Parameters.AddWithValue("@userId", id);
+
+          using (var reader = command.ExecuteReader())
+          {
+            if (reader.Read())
+            {
+              return new User
+              {
+                Id = reader.GetInt32(0),
+                FirstName = reader.GetString(1),
+                LastName = reader.GetString(2),
+                Email = reader.GetString(3),
+                HashedPassword = reader.GetString(4)
+              };
+            }
+          }
+        }
+      }
+      return null;
     }
 
-    public static User GetUserByEmail(string email)
+    public User GetUserByEmail(string email)
     {
       User retrievedUser = new();
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string query = $"SELECT * FROM aemapp_users WHERE email = '{email}'";
@@ -64,9 +93,9 @@ namespace ApprenticeEventManager.DatabaseServices
       }
     }
 
-    public static string AddUserDb(User newUser)
+    public string AddUserDb(User newUser)
     {
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string insertUserQuery = "INSERT INTO aemapp_users (first_name, last_name, email, password) VALUES (@firstName, @lastName, @email, @password)";
@@ -80,22 +109,50 @@ namespace ApprenticeEventManager.DatabaseServices
       return $"Added User: {newUser.FirstName} {newUser.LastName}, {newUser.Email}";
     }
 
-    public static string RemoveUserDb()
+    public bool RemoveUserDb(User user)
     {
-      return "response";
+      User userCheck = GetUserById(user.Id);
+
+      if (userCheck == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string deleteQuery = "DELETE FROM aemapp_users WHERE user_id = @userId";
+        SqliteCommand command = new SqliteCommand(deleteQuery, connection);
+        command.Parameters.AddWithValue("@userId", user.Id);
+        command.ExecuteNonQuery();
+      }
+      return true;
     }
 
-    public static string UpdateUserDb()
+    public bool UpdateUserDb(User updatedUser)
     {
-      return "response";
+      User userCheck = GetUserById(updatedUser.Id);
+
+      if (userCheck == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string updateQuery = "UPDATE aemapp_users SET first_name = @firstName, last_name = @lastName, email = @email WHERE team_id = @userId";
+        SqliteCommand command = new SqliteCommand(updateQuery, connection);
+        command.Parameters.AddWithValue("@firstName", updatedUser.FirstName);
+        command.Parameters.AddWithValue("@lastName", updatedUser.LastName);
+        command.Parameters.AddWithValue("@email", updatedUser.Email);
+        command.Parameters.AddWithValue("@userId", updatedUser.Id);
+        command.ExecuteNonQuery();
+      }
+      return true;
     }
 
-    public static string CreatePasswordUserDb()
-    {
-      return "response";
-    }
-
-    public static string UpdatePasswordUserDb()
+    public string UpdatePasswordUserDb()
     {
       return "response";
     }

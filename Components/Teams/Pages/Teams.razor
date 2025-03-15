@@ -1,7 +1,10 @@
 ﻿@page "/teams"
+
 @rendermode InteractiveServer
 @inject NavigationManager _navigationManager
+@inject TeamDb _teamDb
 
+@using ApprenticeEventManager.DatabaseServices
 @using ApprenticeEventManager.Models
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
@@ -79,7 +82,7 @@
         editContext = new(formModel);
         messageStore = new(editContext);
         response = string.Empty;
-        DbTeams = DatabaseServices.TeamDb.GetAllDbTeams();
+        DbTeams = _teamDb.GetAllDbTeams();
     }
 
     public void HandleSubmit()
@@ -87,7 +90,7 @@
         Team newTeam = new Team();
         newTeam.Name = formModel!.Name;
         newTeam.HomeOffice = formModel!.HomeOffice;
-        response = DatabaseServices.TeamDb.AddTeamDb(newTeam);
+        response = _teamDb.AddTeamDb(newTeam);
         
         _navigationManager.NavigateTo("/teams", true);
     }
@@ -100,7 +103,7 @@
 
     public async Task HandleDelete(Team team)
     {
-        var success = DatabaseServices.TeamDb.RemoveTeamDb(team);
+        var success = _teamDb.RemoveTeamDb(team);
         if (success)
         {
             response = "Team Deleted.";
