@@ -7,6 +7,7 @@
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
+@using System.Security.Claims
 
 <h3>LoginForm</h3>
 
@@ -71,7 +72,13 @@ else
         if (found)
         {
             _LoginService.LogLoginAttempt(formModel!, 1);
-            response = "FOUND";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, formModel.Email),
+                new Claim(ClaimTypes.Role, "Admin"),
+            };
+            _navigationManager.NavigateTo("/", true);
+            //response = "FOUND";
         }
         else
         {

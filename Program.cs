@@ -1,6 +1,7 @@
 using ApprenticeEventManager.Components;
 using ApprenticeEventManager.DatabaseServices;
 using ApprenticeEventManager.LoginServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,16 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+  .AddCookie(options =>
+  {
+    options.LoginPath = "/login";
+    options.LogoutPath = "/logout";
+    options.AccessDeniedPath = "/access-denied";
+  });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<TeamDb>();

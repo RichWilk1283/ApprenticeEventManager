@@ -1,5 +1,8 @@
 ﻿@page "/"
+@attribute [Authorize(Roles = "Admin")]
+
 @using ApprenticeEventManager.Components.Login.Components
+@using Microsoft.AspNetCore.Authorization
 
 <PageTitle>Home</PageTitle>
 
