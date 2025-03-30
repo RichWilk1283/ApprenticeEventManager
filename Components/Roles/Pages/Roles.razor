@@ -1,4 +1,10 @@
 ﻿@page "/roles"
+
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+@inject RoleDb _roleDb
+
+@using ApprenticeEventManager.DatabaseServices
 @using ApprenticeEventManager.Models
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
@@ -43,7 +49,7 @@
                     <div class="card-body">
                         <h4 class="card-title">@role.Name</h4>
                         <a href="#" class="card-link">Update</a>
-                        <a href="#" class="card-link">Delete</a>
+                        <a href="#" class="card-link" @onclick="@(()=> HandleDelete(role))">Delete</a>
                     </div>
                 </div>
             }
@@ -67,15 +73,33 @@
         editContext = new(formModel);
         messageStore = new(editContext);
         response = string.Empty;
-        DbRoles = DatabaseServices.RoleDb.GetAllDbRoles();
+        DbRoles = _roleDb.GetAllDbRoles();
     }
 
     public void handleSubmit()
     {
         Role newRole = new();
         newRole.Name = formModel!.Name;
-        response = DatabaseServices.RoleDb.AddRoleDb(newRole);
-        StateHasChanged();
+        response = _roleDb.AddRoleDb(newRole);
+        _navigationManager.NavigateTo("/roles", true);
+    }
+
+    public void HandleUpdate(Role role)
+    {
+        //show update form?
+        //call update DB function on new data
+    }
+
+    public void HandleDelete(Role role)
+    {
+        var success = _roleDb.RemoveRoleDb(role);
+        if (success)
+        {
+            response = "Role Deleted.";
+        }
+        else response = "Role not found";
+
+        _navigationManager.NavigateTo("/roles", true);
     }
 }
 

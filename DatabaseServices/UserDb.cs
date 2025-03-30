@@ -8,10 +8,12 @@ namespace ApprenticeEventManager.DatabaseServices
   public class UserDb
   {
     private readonly string _connectionString;
+    private RoleDb _roleDb;
 
-    public UserDb(IConfiguration config)
+    public UserDb(IConfiguration config, RoleDb roleDb)
     {
       _connectionString = config.GetConnectionString("DefaultConnection");
+      _roleDb = roleDb;
     }
 
     public List<User> GetAllDbUsers()
@@ -52,7 +54,7 @@ namespace ApprenticeEventManager.DatabaseServices
 
           using (var reader = command.ExecuteReader())
           {
-            if (reader.Read())
+            while (reader.Read())
             {
               return new User
               {
@@ -155,6 +157,52 @@ namespace ApprenticeEventManager.DatabaseServices
     public string UpdatePasswordUserDb()
     {
       return "response";
+    }
+
+    public bool AssignUserRole(int userId, string roleName = "User")
+    {
+      Role role = _roleDb.GetRoleByName(roleName);
+      if (role == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string userRoleQuery = "INSERT INTO aemapp_user_roles (user_id, role_id) VALUES (@userId, @roleId)";
+        SqliteCommand command = new SqliteCommand(userRoleQuery, connection);
+        command.Parameters.AddWithValue("@userId", userId);
+        command.Parameters.AddWithValue("@roleId", role.Id);
+        command.ExecuteNonQuery();
+      }
+
+      return true;
+    }
+
+    public List<string> GetUserRole(User user)
+    {
+      List<string> roles = new();
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string getUsersRolesQuery = "SELECT r.name FROM aemapp_roles r INNER JOIN aemapp_user_roles ur ON r.role_id = ur.role_id WHERE ur.user_id = @userId";
+        using (var command = new SqliteCommand(getUsersRolesQuery, connection))
+        {
+          command.Parameters.AddWithValue("@userId", user.Id);
+
+          using (var reader = command.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              roles.Add(reader.GetString(0));
+            }
+          }
+        }
+      }
+
+      return roles;
     }
   }
 }

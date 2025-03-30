@@ -29,6 +29,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<TeamDb>();
 builder.Services.AddSingleton<UserDb>();
+builder.Services.AddSingleton<RoleDb>();
+
 builder.Services.AddSingleton<LoginService>();
 
 var app = builder.Build();

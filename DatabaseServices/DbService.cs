@@ -56,6 +56,13 @@ namespace ApprenticeEventManager.DatabaseServices
         "email TEXT," +
         "password TEXT)",
 
+        "CREATE TABLE IF NOT EXISTS aemapp_user_roles (" +
+        "user_id INTEGER NOT NULL," +
+        "role_id INTEGER NOT NULL," +
+        "PRIMARY KEY (user_id, role_id)," +
+        "FOREIGN KEY(user_id) REFERENCES aemapp_users(user_id) ON DELETE CASCADE," +
+        "FOREIGN KEY(role_id) REFERENCES aemapp_roles(role_id) ON DELETE CASCADE)",
+
         "CREATE TABLE IF NOT EXISTS aemapp_login_log (" +
         "log_id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "login_date TEXT NOT NULL," +

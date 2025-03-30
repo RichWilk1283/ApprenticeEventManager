@@ -75,7 +75,7 @@ else
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, formModel.Email),
-                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(ClaimTypes.Role, "Admin"),//replace "Admin" with the user role from Db.
             };
             _navigationManager.NavigateTo("/", true);
             //response = "FOUND";

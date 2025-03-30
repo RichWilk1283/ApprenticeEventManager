@@ -5,13 +5,18 @@ namespace ApprenticeEventManager.DatabaseServices
 {
   public class RoleDb
   {
-    private static readonly string connectionString = "Data Source=ApprenticeEventManager.db";
+    private readonly string _connectionString;
 
-    public static List<Role> GetAllDbRoles()
+    public RoleDb(IConfiguration config)
+    {
+      _connectionString = config.GetConnectionString("DefaultConnection");
+    }
+
+    public List<Role> GetAllDbRoles()
     {
       List<Role> roles = new();
 
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string query = "SELECT * FROM aemapp_roles";
@@ -30,14 +35,61 @@ namespace ApprenticeEventManager.DatabaseServices
       return roles;
     }
 
-    public static Role GetById(int id)
+    public Role GetRoleById(int id)
     {
-      return new Role();
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string getByIdQuery = "SELECT * FROM aemapp_roles WHERE role_id = @roleId";
+        using (var command = new SqliteCommand(getByIdQuery, connection))
+        {
+          command.Parameters.AddWithValue("@roleId", id);
+
+          using (var reader = command.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              return new Role
+              {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1)
+              };
+            }
+          }
+        }
+      }
+      return null;
     }
 
-    public static string AddRoleDb(Role newRole)
+    public Role GetRoleByName(string roleName)
     {
-      using (var connection = new SqliteConnection(connectionString))
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string getByIdQuery = "SELECT * FROM aemapp_roles WHERE name = @roleName";
+        using (var command = new SqliteCommand(getByIdQuery, connection))
+        {
+          command.Parameters.AddWithValue("@roleName", roleName);
+
+          using (var reader = command.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              return new Role
+              {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1)
+              };
+            }
+          }
+        }
+        return null;
+      }
+    }
+
+    public string AddRoleDb(Role newRole)
+    {
+      using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
         string insertQuery = "INSERT INTO aemapp_roles (name) VALUES (@name)";
@@ -48,12 +100,27 @@ namespace ApprenticeEventManager.DatabaseServices
       return $"Added Role: {newRole.Name}.";
     }
 
-    public static string RemoveRoleDb()
+    public bool RemoveRoleDb(Role role)
     {
-      return "response";
+      Role roleCheck = GetRoleById(role.Id);
+
+      if (roleCheck == null)
+      {
+        return false;
+      }
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string deleteQuery = "DELETE FROM aemapp_roles WHERE role_id = @roleId";
+        SqliteCommand command = new SqliteCommand(deleteQuery, connection);
+        command.Parameters.AddWithValue("@roleId", role.Id);
+        command.ExecuteNonQuery();
+      }
+      return true;
     }
 
-    public static string UpdateRoleDb()
+    public string UpdateRoleDb()
     {
       return "response";
     }

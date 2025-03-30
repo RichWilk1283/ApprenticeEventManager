@@ -1,5 +1,5 @@
 ﻿@page "/users"
-@attribute [Authorize(Roles = "Admin")]
+@* @attribute [Authorize(Roles = "Admin")] *@
 
 @rendermode InteractiveServer
 @inject NavigationManager _navigationManager
@@ -116,7 +116,10 @@
         var passwordHasher = new PasswordHasher<User>();
         newUser.HashedPassword = passwordHasher.HashPassword(null, formModel!.HashedPassword);
         response = _userDb.AddUserDb(newUser);
-        StateHasChanged();
+        //retieve this new user from database for its actual db id.
+        User user = _userDb.GetUserByEmail(newUser.Email);
+        //add the user role.
+        _userDb.AssignUserRole(user.Id);
         _navigationManager.NavigateTo("/users", true);
     }
 
