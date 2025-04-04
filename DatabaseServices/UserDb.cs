@@ -1,6 +1,4 @@
-﻿using ApprenticeEventManager.Components.Teams.Pages;
-using ApprenticeEventManager.Components.Users.Pages;
-using ApprenticeEventManager.Models;
+﻿using ApprenticeEventManager.Models;
 using Microsoft.Data.Sqlite;
 
 namespace ApprenticeEventManager.DatabaseServices

@@ -19,18 +19,20 @@ builder.Services.AddRazorComponents()
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
   .AddCookie(options =>
   {
+    options.Cookie.Name = "aem_authtoken";
     options.LoginPath = "/login";
+    options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
     options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/access-denied";
   });
 
 builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddSingleton<DbService>();
 builder.Services.AddSingleton<TeamDb>();
 builder.Services.AddSingleton<UserDb>();
 builder.Services.AddSingleton<RoleDb>();
-
 builder.Services.AddSingleton<LoginService>();
 
 var app = builder.Build();
@@ -50,6 +52,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

@@ -1,5 +1,4 @@
-﻿@rendermode InteractiveServer
-@inject NavigationManager _navigationManager
+﻿@inject NavigationManager _navigationManager
 @inject LoginService _LoginService
 
 @using ApprenticeEventManager.Components.Login.Models
@@ -8,6 +7,8 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
 
 <h3>LoginForm</h3>
 
@@ -50,6 +51,9 @@ else
 
 
 @code {
+    [CascadingParameter]
+    public HttpContext? HttpContext{ get; set; }
+
     private EditContext? editContext;
     private ValidationMessageStore? messageStore;
     private string response;
@@ -65,7 +69,7 @@ else
         response = string.Empty;
     }
 
-    public void HandleSubmit()
+    public async Task HandleSubmit()
     {
         //handle login
         bool found = _LoginService.AuthenticateUser(formModel!);
@@ -75,18 +79,20 @@ else
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, formModel.Email),
-                new Claim(ClaimTypes.Role, "Admin"),//replace "Admin" with the user role from Db.
+                new Claim(ClaimTypes.Role, "User"),  //replace "Admin" with the user role from Db.
             };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(principal);
+
             _navigationManager.NavigateTo("/", true);
-            //response = "FOUND";
         }
         else
         {
             _LoginService.LogLoginAttempt(formModel!, 0);
         }
         StateHasChanged();
-        //_navigationManager.NavigateTo("/", true);
+        _navigationManager.NavigateTo("/", true);
     }
-
-
 }

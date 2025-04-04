@@ -1,5 +1,7 @@
 ﻿@page "/logout"
+@inject NavigationManager _navigationManager
 @using ApprenticeEventManager.Components.Login.Components
+@using Microsoft.AspNetCore.Authentication
 
 <PageTitle>Log Out</PageTitle>
 
@@ -8,5 +10,17 @@
 @* Button to return to home page ? *@
 
 @code {
+  [CascadingParameter]
+  public HttpContext? HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (HttpContext.User.Identity.IsAuthenticated)
+        {
+            await HttpContext.SignOutAsync();
+            _navigationManager.NavigateTo("/logout", true);
+        }
+    }
 
 }
