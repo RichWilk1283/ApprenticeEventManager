@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Events\Components\" />
     <Folder Include="Components\Login\Services\" />
   </ItemGroup>
 

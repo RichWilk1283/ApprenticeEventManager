@@ -1,5 +1,4 @@
 ﻿@page "/"
-@* @attribute [Authorize(Roles = "Admin")] *@
 
 @using ApprenticeEventManager.Components.Login.Components
 @using Microsoft.AspNetCore.Authorization
@@ -8,4 +7,30 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<p>@message</p>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            // User is authenticated
+            // You can access user claims here if needed
+            var userName = user.Identity.Name;
+            message = $"Welcome, {userName}!";
+        }
+        else
+        {
+            // User is not authenticated
+            // Redirect to login page or show a message
+            message = "Welcome!";
+        }
+    }
+}

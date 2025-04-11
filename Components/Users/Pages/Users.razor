@@ -19,7 +19,7 @@
         <h2 class="page-title-heading">New Users</h2>
     </div>
     <div class="d-flex justify-content-center">
-        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="NewUser">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="flex-column">
@@ -80,7 +80,7 @@
                         <h4 class="card-title">@user.LastName, @user.FirstName</h4>
                         <p class="card-text">@user.Email</p>
                         <p class="card-text">@user.HashedPassword</p>
-                        <a href="#" class="card-link">Update</a>
+                        <a href="#" class="card-link" @onclick="@(()=> HandleUpdate(user))">Update</a>
                         <a href="#" class="card-link" @onclick="@(async ()=> await HandleDelete(user))">Delete</a>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
         DbUsers = _userDb.GetAllDbUsers();
     }
 
-    public void handleSubmit(){
+    public void HandleSubmit(){
         User newUser = new User();
         newUser.FirstName = formModel!.FirstName;
         newUser.LastName = formModel!.LastName;
@@ -118,15 +118,14 @@
         response = _userDb.AddUserDb(newUser);
         //retieve this new user from database for its actual db id.
         User user = _userDb.GetUserByEmail(newUser.Email);
-        //add the user role.
-        _userDb.AssignUserRole(user.Id);
+
+        _userDb.AssignUserRole(user.Id); //as no 2nd parameter is passed, it defaults to "User" role.
         _navigationManager.NavigateTo("/users", true);
     }
 
     public void HandleUpdate(User user)
     {
-        //show update form?
-        //call update DB function on new data
+        _navigationManager.NavigateTo($"/user/{user.Id}", true);
     }
 
     public async Task HandleDelete(User user)

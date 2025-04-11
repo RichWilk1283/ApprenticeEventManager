@@ -1,7 +1,9 @@
 ﻿@inject NavigationManager _navigationManager
 @inject LoginService _LoginService
+@inject UserDb _userDb
 
 @using ApprenticeEventManager.Components.Login.Models
+@using ApprenticeEventManager.DatabaseServices
 @using ApprenticeEventManager.Models
 @using System.Diagnostics
 @using System.ComponentModel.DataAnnotations
@@ -71,15 +73,17 @@ else
 
     public async Task HandleSubmit()
     {
-        //handle login
         bool found = _LoginService.AuthenticateUser(formModel!);
         if (found)
         {
+            var user = _userDb.GetUserByEmail(formModel!.Email);
+            var userRole = _userDb.GetUserRole(user);
+
             _LoginService.LogLoginAttempt(formModel!, 1);
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, formModel.Email),
-                new Claim(ClaimTypes.Role, "User"),  //replace "Admin" with the user role from Db.
+                new Claim(ClaimTypes.Role, userRole[0]),
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

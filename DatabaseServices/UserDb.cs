@@ -141,7 +141,7 @@ namespace ApprenticeEventManager.DatabaseServices
       using (var connection = new SqliteConnection(_connectionString))
       {
         connection.Open();
-        string updateQuery = "UPDATE aemapp_users SET first_name = @firstName, last_name = @lastName, email = @email WHERE team_id = @userId";
+        string updateQuery = "UPDATE aemapp_users SET first_name = @firstName, last_name = @lastName, email = @email WHERE user_id = @userId";
         SqliteCommand command = new SqliteCommand(updateQuery, connection);
         command.Parameters.AddWithValue("@firstName", updatedUser.FirstName);
         command.Parameters.AddWithValue("@lastName", updatedUser.LastName);

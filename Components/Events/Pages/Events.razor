@@ -1,7 +1,132 @@
 ﻿@page "/events"
 
-<h3>Events</h3>
+@rendermode InteractiveServer
+@inject EventDb _eventDb
+@inject NavigationManager _navigationManager
+
+@using ApprenticeEventManager.DatabaseServices
+@using ApprenticeEventManager.Models
+
+<div class="container vw-100">
+    <div class="page-title-container">
+        <h2 class="page-title-heading">New Event</h2>
+    </div>
+    <div class="d-flex justify-content-center">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="NewEvent">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="flex-column">
+                <div class="">
+                    <div class="">
+                        <label>Event Name:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.Name" />
+                        <ValidationMessage For="@(() => formModel!.Name)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Description:</label>
+                    </div>
+                    <div class="">
+                        <InputText @bind-Value="formModel!.Description" />
+                        <ValidationMessage For="@(() => formModel!.Description)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Date:</label>
+                    </div>
+                    <div class="">
+                        <InputDate @bind-Value="formModel!.Date" />
+                        <ValidationMessage For="@(() => formModel!.Date)" />
+                    </div>
+                </div>
+                <div class="">
+                    <div class="">
+                        <label>Apprentices Required:</label>
+                    </div>
+                    <div class="">
+                        <InputNumber @bind-Value="formModel!.TotalApprenticesRequired" />
+                        <ValidationMessage For="@(() => formModel!.TotalApprenticesRequired)" />
+                    </div>
+                </div>
+            </div>
+            <div class="pt-3">
+                <button type="submit">Submit</button>
+            </div>
+        </EditForm>
+    </div>
+
+    @if (DbEvents == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var dbEvent in DbEvents)
+            {
+                <div class="card p-3 m-1">
+                    <div class="card-body">
+                        <h4 class="card-title">@dbEvent.Name</h4>
+                        <p class="card-text">@dbEvent.Description</p>
+                        <p class="card-text">@dbEvent.Date</p>
+                        <p class="card-text">@dbEvent.TotalApprenticesRequired</p>
+                        <a href="#" class="card-link" @onclick="@(()=> HandleView(@dbEvent))">View</a>
+                        <a href="#" class="card-link" @onclick="@(async ()=> await HandleDelete(@dbEvent))">Delete</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private string response;
+    private List<Event> DbEvents;
 
+    [SupplyParameterFromForm]
+    public Event? formModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        formModel ??= new();
+        formModel.Date = DateOnly.FromDateTime(DateTime.Today);
+        editContext = new(formModel);
+        messageStore = new(editContext);
+        response = string.Empty;
+        DbEvents = _eventDb.GetAllDbEvents();
+    }
+
+    public void HandleSubmit()
+    {
+        Event newEvent = new();
+        newEvent.Name = formModel!.Name;
+        newEvent.Description = formModel!.Description;
+        newEvent.Date = formModel!.Date;
+        newEvent.TotalApprenticesRequired = formModel!.TotalApprenticesRequired;
+        _eventDb.AddEventDb(newEvent);        
+      _navigationManager.NavigateTo("/events", true);
+    }
+
+    public async Task HandleDelete(Event dbEvent)
+    {
+        var success = _eventDb.RemoveEventDb(dbEvent);
+        if (success)
+        {
+            response = "Event deleted successfully.";
+        }
+        else response = "Event deletion failed.";
+
+        _navigationManager.NavigateTo("/events", true);
+    }
+
+    public void HandleView(Event dbEvent)
+    {
+        _navigationManager.NavigateTo($"/events/{dbEvent.Id}", true);
+    }
 }
