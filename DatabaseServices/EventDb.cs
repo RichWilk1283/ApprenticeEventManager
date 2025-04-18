@@ -145,5 +145,50 @@ namespace ApprenticeEventManager.DatabaseServices
       return true;
     }
 
+    public void AddUserToEvent(int eventId, int userId)
+    {
+      //add user to event join table.
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+
+        string insertQuery = "INSERT INTO aemapp_user_events (user_id, event_id) VALUES (@userId, @eventId)";
+        using (var command = new SqliteCommand(insertQuery, connection))
+        {
+          command.Parameters.AddWithValue("@eventId", eventId);
+          command.Parameters.AddWithValue("@userId", userId);
+          command.ExecuteNonQuery();
+        }
+      }
+    }
+
+    public List<User> GetAllUsersForEvent(int eventId)
+    {
+      List<User> allUsers = new();
+
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string query = "SELECT * FROM aemapp_users u JOIN aemapp_user_events ue ON u.user_id = ue.user_id WHERE ue.event_id = @eventId;";
+        using (var command = new SqliteCommand(query, connection))
+        {
+          command.Parameters.AddWithValue("@eventId", eventId);
+
+          using (var reader = command.ExecuteReader())
+          {
+            while (reader.Read())
+            {
+              User newUser = new();
+              newUser.Id = reader.GetInt32(0);
+              newUser.FirstName = reader.GetString(1);
+              newUser.LastName = reader.GetString(2);
+              newUser.Email = reader.GetString(3);
+              allUsers.Add(newUser);
+            }
+          }
+        }
+      }
+      return allUsers;
+    }
   }
 }

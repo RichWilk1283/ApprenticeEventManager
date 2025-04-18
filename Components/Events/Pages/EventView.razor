@@ -1,11 +1,14 @@
 ﻿@page "/events/{eventId:int}"
+
+@rendermode InteractiveServer
 @inject NavigationManager _navigationManager
 @inject EventDb _eventDb
+@inject UserDb _userDb
 
 @using ApprenticeEventManager.DatabaseServices
 @using ApprenticeEventManager.Models
 
-@if (dbEvent == null)
+@if (DbEvent == null)
 {
     <p>Loading...</p>
 }
@@ -23,7 +26,7 @@ else
                             <label>Name:</label>
                         </div>
                         <div class="">
-                            <p>@dbEvent.Name</p>
+                            <p>@DbEvent.Name</p>
                         </div>
                     </div>
                     <div class="">
@@ -31,7 +34,7 @@ else
                             <label>Description:</label>
                         </div>
                         <div class="">
-                            <p>@dbEvent.Description</p>
+                            <p>@DbEvent.Description</p>
                         </div>
                     </div>
                     <div class="">
@@ -39,15 +42,35 @@ else
                             <label>Date:</label>
                         </div>
                         <div class="">
-                            <p>@dbEvent.Date</p>
+                            <p>@DbEvent.Date</p>
                         </div>
                     </div>
                     <div class="pt-3">
-                        <button>Sign Up</button>
+                        <button @onclick="@(() => HandleSignUp())">Sign Up</button>
                     </div>
                 </div>
             </div>
         </div>
+        @if (DbUsers == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var user in DbUsers)
+                {
+                    <div class="card p-3 m-1">
+                        <div class="card-body">
+                            <h4 class="card-title">@user.LastName, @user.FirstName</h4>
+                            <p class="card-text">@user.Email</p>
+                            @* <a href="#" class="card-link" @onclick="@(()=> HandleUpdate(user))">Update</a>
+                            <a href="#" class="card-link" @onclick="@(async ()=> await HandleDelete(user))">Delete</a> *@
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 
 
@@ -55,24 +78,28 @@ else
 
 
 @code {
-
     [Parameter]
     public int EventId { get; set; }
-    private Event? dbEvent;
+    private Event? DbEvent;
+    private List<User>? DbUsers;
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        dbEvent = _eventDb.GetEventById(EventId);
+        DbEvent = _eventDb.GetEventById(EventId);
+        DbUsers = _eventDb.GetAllUsersForEvent(EventId);
         //retieve all users signed up to this
     }
 
-    public void handleSignUp()
+    public async Task HandleSignUp()
     {
-        //fetch sign in user by email retrieved from authState.
-        //check its not null.
-        //use user.id and EventId param to call a signup menthod in EventDb.cs
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+        var userEmail = user.Identity.Name;
+        User dBUser = _userDb.GetUserByEmail(userEmail);
+        _eventDb.AddUserToEvent(EventId, dBUser.Id);
+        _navigationManager.NavigateTo("/events", true);
     }
 
 }
