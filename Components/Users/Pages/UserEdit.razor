@@ -3,6 +3,7 @@
 
 @rendermode InteractiveServer
 @inject UserDb _userDb
+@inject RoleDb _roleDb
 @inject NavigationManager _navigationManager
 
 @using ApprenticeEventManager.DatabaseServices
@@ -13,7 +14,7 @@
         <h2 class="page-title-heading">Edit User</h2>
     </div>
     <div class="d-flex justify-content-center">
-        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewUser">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="NewUser">
             <div class="flex-column">
                 <div class="">
                     <div class="">
@@ -45,6 +46,34 @@
             </div>
         </EditForm>
     </div>
+
+    <div class="row">
+        <div class="card p-3 m-1">
+            <div class="card-body">
+                <h4 class="card-title">Current Role:</h4>
+                <p>@userRoles[0]</p>
+            </div>
+        </div>
+    </div>
+
+    @if (DbRoles == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var role in DbRoles)
+            {
+                <div class="card p-3 m-1">
+                    <div class="card-body">
+                        <h4 class="card-title">@role.Name</h4>
+                        <a href="#" class="card-link" @onclick="@(()=> HandleAssign(role))">Assign</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @code {
@@ -55,6 +84,8 @@
     private EditContext? editContext;
     private ValidationMessageStore? messageStore;
     private string response;
+    private List<Role> DbRoles;
+    private List<string> userRoles;
 
     [SupplyParameterFromForm]
     public User? formModel { get; set; }
@@ -65,13 +96,13 @@
         editContext = new(formModel);
         messageStore = new(editContext);
         response = string.Empty;
-        //get user from id.
         var user = _userDb.GetUserById(UserId);
-        //set formModel to the user.
         formModel = user;
+        userRoles = _userDb.GetUserRole(user);
+        DbRoles = _roleDb.GetAllDbRoles();
     }
 
-    public void handleSubmit()
+    public void HandleSubmit()
     {
         var success = _userDb.UpdateUserDb(formModel!);
 
@@ -83,6 +114,13 @@
         else response = "User not found";
 
         _navigationManager.NavigateTo("/users", true);
+    }
+
+    public void HandleAssign(Role role)
+    {
+        //update users role.
+        _userDb.UpdateUserRole(formModel!.Id, role.Id);
+        _navigationManager.NavigateTo($"/user/{formModel!.Id}", true);
     }
 
 }

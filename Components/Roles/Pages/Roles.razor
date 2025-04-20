@@ -17,7 +17,7 @@
         <h2 class="page-title-heading">New Roles</h2>
     </div>
     <div class="d-flex justify-content-center">
-        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@handleSubmit" FormName="NewRole">
+        <EditForm class="w-50 mt-2 mb-4 form-container" EditContext="editContext" OnValidSubmit="@HandleSubmit" FormName="NewRole">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="flex-column">
@@ -76,7 +76,7 @@
         DbRoles = _roleDb.GetAllDbRoles();
     }
 
-    public void handleSubmit()
+    public void HandleSubmit()
     {
         Role newRole = new();
         newRole.Name = formModel!.Name;

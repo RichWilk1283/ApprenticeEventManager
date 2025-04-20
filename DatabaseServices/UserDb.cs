@@ -178,6 +178,20 @@ namespace ApprenticeEventManager.DatabaseServices
       return true;
     }
 
+    public void UpdateUserRole(int userId, int roleId)
+    {
+      using (var connection = new SqliteConnection(_connectionString))
+      {
+        connection.Open();
+        string updateQuery = "UPDATE aemapp_user_roles SET role_id = @roleId WHERE user_id = @userId";
+        SqliteCommand command = new SqliteCommand(updateQuery, connection);
+        command.Parameters.AddWithValue("@roleId", roleId);
+        command.Parameters.AddWithValue("@userId", userId);
+        command.ExecuteNonQuery();
+      }
+
+    }
+
     public List<string> GetUserRole(User user)
     {
       List<string> roles = new();
